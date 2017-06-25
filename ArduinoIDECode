@@ -1,0 +1,76 @@
+/**************************************************************
+ * IoT Motion Detector with Blynk
+ * Blynk is a platform with iOS and Android apps to control
+ * Arduino, Raspberry Pi and the likes over the Internet.
+ * You can easily build graphic interfaces for all your projects by simply dragging and dropping widgets.
+ *   Downloads, docs, tutorials: http://www.blynk.cc
+ *   Blynk community:            http://community.blynk.cc
+ *   Social networks:            http://www.fb.com/blynkapp
+                                 http://twitter.com/blynk_app
+ * Blynk library is licensed under MIT license
+ * This example code is in public domain.
+ **************************************************************
+ * This example runs directly on ESP8266 chip.
+ * You need to install this for ESP8266 development:
+ * https://github.com/esp8266/Arduino
+ * Please be sure to select the right ESP8266 module in the Tools -> Board menu!
+ * Change WiFi ssid, pass, and Blynk auth token to run :)
+ **************************************************************/
+#include <ESP8266WiFi.h>
+#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
+#include <BlynkSimpleEsp8266.h>
+char auth[] = "Blynk Auth";
+
+/* WiFi credentials */
+char ssid[] = "WiFi SSID";
+char pass[] = "WiFi Password";
+
+/* HC-SR501 Motion Detector */
+#define ledPin 14 // LED for PIR 1
+#define pirPin 12 // Input for HC-S501 1
+#define ledPin2 13 // LED for PIR 2
+#define pirPin2 15 // Input for HC-S501 2
+int pirValue; // Place to store read PIR Value
+int pirValue2; // Place to store read PIR Value 2
+
+void setup()
+{
+  Serial.begin(115200);
+  delay(10);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(ledPin, OUTPUT);
+  pinMode(pirPin, INPUT);
+  digitalWrite(ledPin, LOW);
+  pinMode(ledPin2, OUTPUT);
+  pinMode(pirPin2, INPUT);
+  digitalWrite(ledPin, LOW);
+}
+
+void loop()
+{
+  getPirValue();
+  getPirValue2();
+  Blynk.run();
+}
+void getPirValue(void)
+{
+  pirValue = digitalRead(pirPin);
+  if (pirValue) 
+  { 
+    Serial.println("Driveway Motion");
+    Blynk.notify("Driveway Motion");
+    delay(500);  
+  }
+  digitalWrite(ledPin, pirValue);
+}
+void getPirValue2(void)
+{
+  pirValue2 = digitalRead(pirPin2);
+  if (pirValue2)
+  {
+    Serial.println("Yard Motion");
+    Blynk.notify("Yard Motion");
+    delay(500);
+  }
+  digitalWrite(ledPin2, pirValue2);
+}
